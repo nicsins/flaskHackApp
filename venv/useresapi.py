@@ -1,7 +1,7 @@
 import requests
 import os
 
-apiKey = 'YOUR KEY'
+apiKey = 'cyB4LCMpHGbyJQEgurGYrEKO2FSrQGpV'
 
 users_URL = 'https://alpha-api.usbank.com/innovations/v1/users'
 user_IDs = []
@@ -36,3 +36,12 @@ for account in account_deets:
 print (company_ID)
 print(product_code)
 print(primary_ID)
+
+# Search based on categroy
+CATEGORY_URL = 'https://alpha-api.usbank.com/innovations/v1/codes'
+
+category_list = list()
+
+#category_list.append(requests.post(CATEGORY_URL, headers=header).json())
+print("ok")
+print(requests.get(CATEGORY_URL, headers=header).json())
