@@ -41,7 +41,7 @@ for i in range(len(company_ID)):
 transactions = []
 
 for transaction in transaction_data:
-
+    #TODO add something to only pull in last week or whatever
     try:
         for i in range(len(transaction)):
             for j in range(len(transaction['TransactionList'])):
