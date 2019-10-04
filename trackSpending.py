@@ -17,7 +17,9 @@
 
 #todo create a dictionary  categories={categoryname: merchcode} create a menu funtion?
 
-'''todo add new transaction variable newPurchase then select from categories menu  then push to purchaseTotals  [if k=[ k for k,v in categories] purchaseTotals.push( '''
+'''todo add new transaction variable newPurchase then select from categories menu  then push to purchaseTotals  [if k=[ k for k,v in categories] purchaseTotals.update(k=v+newPurchase) for k,v in purchaseTotals] '''
+
+#todo display current account info purchase transaction categories percentages
 
 
 
