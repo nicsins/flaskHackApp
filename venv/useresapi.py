@@ -46,9 +46,14 @@ for i in range(len(company_ID)):
 transactions = []
 for transaction in transaction_data:
     try:
-        transactions.append(transaction['TransactionList'][0]['PostedAmount'])
+        for i in range(len(transaction)):
+            tempTransaction = [transaction['TransactionList'][0]['PostedAmount'],
+                               transaction['TransactionList'][0]['EffectiveDate'],
+                               transaction['TransactionList'][0]['AccountPrimaryIdentifier']]
+            transactions.append(tempTransaction)
     except KeyError:
         print("No transactions for this user.")
 
 for transaction in transactions:
-    print("$" + str(float(transaction) * .001))
+    print('Transaction: ' + str(transaction))
+    print('Amount to be saved: $' + str(float(transaction[0]) * .001))
