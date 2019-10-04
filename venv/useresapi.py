@@ -47,13 +47,15 @@ transactions = []
 for transaction in transaction_data:
     try:
         for i in range(len(transaction)):
-            tempTransaction = [transaction['TransactionList'][0]['PostedAmount'],
-                               transaction['TransactionList'][0]['EffectiveDate'],
-                               transaction['TransactionList'][0]['AccountPrimaryIdentifier']]
-            transactions.append(tempTransaction)
+            for j in range(len(transaction['TransactionList'])):
+                tempTransaction = [transaction['TransactionList'][j]['PostedAmount'],
+                                   transaction['TransactionList'][j]['EffectiveDate'],
+                                   transaction['TransactionList'][j]['AccountPrimaryIdentifier']]
+                transactions.append(tempTransaction)
     except KeyError:
         print("No transactions for this user.")
 
 for transaction in transactions:
     print('Transaction: ' + str(transaction))
-    print('Amount to be saved: $' + str(float(transaction[0]) * .001))
+    amount = float(transaction[0]) * .002
+    print('Amount to be saved: $' + str(round(amount, 2)))
