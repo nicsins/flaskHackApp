@@ -1,6 +1,10 @@
 #todo get user info
-
+#todo create menu that chooses user
+from useresapi import user_IDs
 # todo get  userID
+name=input('pleasae enter userid')
+def getUserId(name):
+
 
 # todo get user account info
 
