@@ -45,22 +45,33 @@ for transaction in transaction_data:
     try:
         for i in range(len(transaction)):
             for j in range(len(transaction['TransactionList'])):
-                tempTransaction = [transaction['TransactionList'][j]['PostedAmount'],
-                                   transaction['TransactionList'][j]['EffectiveDate'],
-                                   transaction['TransactionList'][j]['AccountPrimaryIdentifier']]
-                transactions.append(tempTransaction)
+
+                try:
+                    tempTransaction = [transaction['TransactionList'][j]['PostedAmount'],
+                                       transaction['TransactionList'][j]['EffectiveDate'],
+                                       transaction['TransactionList'][j]['AccountPrimaryIdentifier'],
+                                       transaction['TransactionList'][j]['TransactionDescription']]
+                    transactions.append(tempTransaction)
+                except KeyError:
+                    tempTransaction = [transaction['TransactionList'][j]['PostedAmount'],
+                                       transaction['TransactionList'][j]['EffectiveDate'],
+                                       transaction['TransactionList'][j]['AccountPrimaryIdentifier']]
+
+                    transactions.append(tempTransaction)
     except KeyError:
         print("No transactions for this user.")
 
 temporaryID = transactions[0][2]
 temporaryTotal = 0.0
 totalDict = {}
+print(transactions)
 
 for transaction in transactions:
     if transaction[2] != temporaryID:
         totalDict[temporaryID] = temporaryTotal
         temporaryID = transaction[2]
         temporaryTotal = 0.0
+        #print(transaction)
     temporaryTotal += float(transaction[0])
 totalDict[temporaryID] = temporaryTotal
 
@@ -71,4 +82,6 @@ for total in totalDict:
     print('User: ' + total)
     amount = float(totalDict[total]) * percentToSave
     print('Amount to save: $' + str(round(amount, 2)))
-    print()
+
+
+
