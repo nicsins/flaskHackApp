@@ -45,5 +45,5 @@ for i in range(len(company_ID)):
 
 print('TEST')
 for transaction in transaction_data:
-    print(transaction['TransactionList'])
+    print(transaction)
 
