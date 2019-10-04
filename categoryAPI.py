@@ -1,7 +1,7 @@
 import requests
 import os
 
-apiKey = 'cyB4LCMpHGbyJQEgurGYrEKO2FSrQGpV'
+apiKey = 'API_KEY'
 
 users_URL = 'https://alpha-api.usbank.com/innovations/v1/users'
 user_IDs = []
