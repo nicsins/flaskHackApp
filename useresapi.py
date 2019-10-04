@@ -7,7 +7,7 @@ users_URL = 'https://alpha-api.usbank.com/innovations/v1/users'
 user_IDs = []
 
 header = {'apiKey' : apiKey}
-response = requests.get(users_URL,headers = header).json()
+response = requests.get(users_URL, headers=header).json()
 user_list = response['UserList']
 for user in user_list:
     user_IDs.append(user['LegalParticipantIdentifier'])
@@ -18,7 +18,7 @@ accounts_url = 'https://alpha-api.usbank.com/innovations/v1/user/accounts'
 account_deets = []
 for id in user_IDs:
     data = {'LegalParticipantIdentifier': id}
-    account_deets.append(requests.post(accounts_url, headers= header, data= data).json())
+    account_deets.append(requests.post(accounts_url, headers=header, data=data).json())
 
 
 company_ID = []
@@ -52,11 +52,6 @@ for transaction in transaction_data:
     except KeyError:
         print("No transactions for this user.")
 
-for transaction in transactions:
-    # print('Transaction: ' + str(transaction))
-    amount = float(transaction[0]) * .002
-    # print('Amount to be saved: $' + str(round(amount, 2)))
-
 temporaryID = transactions[0][2]
 temporaryTotal = 0.0
 totalDict = {}
@@ -69,4 +64,11 @@ for transaction in transactions:
     temporaryTotal += float(transaction[0])
 totalDict[temporaryID] = temporaryTotal
 
-print(totalDict)
+
+for total in totalDict:
+    #TODO determine how many weeks the user has been using this to save and multiply it by .002
+    percentToSave = .002
+    print('User: ' + total)
+    amount = float(totalDict[total]) * percentToSave
+    print('Amount to save: $' + str(round(amount, 2)))
+    print()
