@@ -23,6 +23,16 @@ for id in user_IDs:
     account_deets.append(requests.post(accounts_url, headers= header, data= data).json())
 
 print(account_deets)
+company_ID = []
+product_code= []
+primary_ID = []
 
 for account in account_deets:
-    print(account)
+    print(account['AccessibleAccountDetailList'][0])
+    company_ID.append(accountaccount['AccessibleAccountDetailList'][0]['OperatingCompanyIdentifier'])
+    product_code.append(account['AccessibleAccountDetailList'][0]['ProductCode'])
+    primary_ID.append(account['AccessibleAccountDetailList'][0]['PrimaryIdentifier'])
+
+print (company_ID)
+print(product_code)
+print(primary_ID)
