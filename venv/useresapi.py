@@ -17,11 +17,12 @@ print(user_IDs[0])
 data = {'LegalParticipantIdentifier': user_IDs[0]}
 
 accounts_url = 'https://alpha-api.usbank.com/innovations/v1/user/accounts'
+account_deets = []
+for id in user_IDs:
+    data = {'LegalParticipantIdentifier': id}
+    account_deets.append(requests.post(accounts_url, headers= header, data= data).json())
 
-account_der = requests.post(accounts_url, headers= header, data= data).json()
-print(account_der)
+print(account_deets)
 
-for account in account_der:
+for account in account_deets:
     print(account)
-
-
