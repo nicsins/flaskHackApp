@@ -1,7 +1,7 @@
 import requests
 import os
 
-apiKey = os.environ['APIKEY']
+apiKey = 'YOUR KEY'
 
 users_URL = 'https://alpha-api.usbank.com/innovations/v1/users'
 user_IDs = []
@@ -29,7 +29,7 @@ primary_ID = []
 
 for account in account_deets:
     print(account['AccessibleAccountDetailList'][0])
-    company_ID.append(accountaccount['AccessibleAccountDetailList'][0]['OperatingCompanyIdentifier'])
+    company_ID.append(account['AccessibleAccountDetailList'][0]['OperatingCompanyIdentifier'])
     product_code.append(account['AccessibleAccountDetailList'][0]['ProductCode'])
     primary_ID.append(account['AccessibleAccountDetailList'][0]['PrimaryIdentifier'])
 
