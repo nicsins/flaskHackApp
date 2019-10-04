@@ -26,7 +26,8 @@ def chooseUser():
 if __name__ == '__main__':
     ids=chooseUser()
     print(ids)
-    print(user_IDs["Codes"])
+    [print(user_IDs[0] )]
+    # print(user_IDs["Codes"])
 # todo get  userID
 
 
