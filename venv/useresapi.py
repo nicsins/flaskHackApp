@@ -29,10 +29,22 @@ primary_ID = []
 
 for account in account_deets:
     print(account['AccessibleAccountDetailList'][0])
-    company_ID.append(accountaccount['AccessibleAccountDetailList'][0]['OperatingCompanyIdentifier'])
+    company_ID.append(account['AccessibleAccountDetailList'][0]['OperatingCompanyIdentifier'])
     product_code.append(account['AccessibleAccountDetailList'][0]['ProductCode'])
     primary_ID.append(account['AccessibleAccountDetailList'][0]['PrimaryIdentifier'])
 
-print (company_ID)
+print(company_ID)
 print(product_code)
 print(primary_ID)
+
+transactions_url = 'https://alpha-api.usbank.com/innovations/v1/account/transactions'
+transaction_data = []
+for i in range(len(company_ID)):
+    company_data = {'OperatingCompanyIdentifier': company_ID[i], 'ProductCode': product_code[i], 'PrimaryIdentifier': primary_ID[i]}
+    transaction_data.append(requests.post(transactions_url, headers=header, data=company_data).json())
+
+print('TEST')
+for transaction in transaction_data:
+    print(transaction)
+#    print(transaction['TransactionList'])
+
