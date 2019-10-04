@@ -43,9 +43,12 @@ for i in range(len(company_ID)):
     company_data = {'OperatingCompanyIdentifier': company_ID[i], 'ProductCode': product_code[i], 'PrimaryIdentifier': primary_ID[i]}
     transaction_data.append(requests.post(transactions_url, headers=header, data=company_data).json())
 
+transactions = []
 for transaction in transaction_data:
     try:
-        print(transaction['TransactionList'])
+        transactions.append(transaction['TransactionList'][0]['PostedAmount'])
     except KeyError:
         print("No transactions for this user.")
 
+for transaction in transactions:
+    print("$" + str(float(transaction) * .001))
