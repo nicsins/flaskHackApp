@@ -43,7 +43,9 @@ for i in range(len(company_ID)):
     company_data = {'OperatingCompanyIdentifier': company_ID[i], 'ProductCode': product_code[i], 'PrimaryIdentifier': primary_ID[i]}
     transaction_data.append(requests.post(transactions_url, headers=header, data=company_data).json())
 
-print('TEST')
 for transaction in transaction_data:
-    print(transaction)
+    try:
+        print(transaction['TransactionList'])
+    except KeyError:
+        print("No transactions for this user.")
 
