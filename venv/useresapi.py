@@ -20,3 +20,8 @@ accounts_url = 'https://alpha-api.usbank.com/innovations/v1/user/accounts'
 
 account_der = requests.post(accounts_url, headers= header, data= data).json()
 print(account_der)
+
+for account in account_der:
+    print(account)
+
+
