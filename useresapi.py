@@ -10,7 +10,6 @@ header = {'apiKey' : apiKey}
 response = requests.get(users_URL,headers = header).json()
 user_list = response['UserList']
 for user in user_list:
-
     user_IDs.append(user['LegalParticipantIdentifier'])
 
 data = {'LegalParticipantIdentifier': user_IDs[0]}
@@ -23,7 +22,7 @@ for id in user_IDs:
 
 
 company_ID = []
-product_code= []
+product_code = []
 primary_ID = []
 
 for account in account_deets:
@@ -54,8 +53,20 @@ for transaction in transaction_data:
         print("No transactions for this user.")
 
 for transaction in transactions:
-    print('Transaction: ' + str(transaction))
+    # print('Transaction: ' + str(transaction))
     amount = float(transaction[0]) * .002
-    print('Amount to be saved: $' + str(round(amount, 2)))
+    # print('Amount to be saved: $' + str(round(amount, 2)))
 
-print(transactions)
+temporaryID = transactions[0][2]
+temporaryTotal = 0.0
+totalDict = {}
+
+for transaction in transactions:
+    if transaction[2] != temporaryID:
+        totalDict[temporaryID] = temporaryTotal
+        temporaryID = transaction[2]
+        temporaryTotal = 0.0
+    temporaryTotal += float(transaction[0])
+totalDict[temporaryID] = temporaryTotal
+
+print(totalDict)
