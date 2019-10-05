@@ -1,39 +1,50 @@
 import requests
 import operator
 import datetime
+import os
 
-apiKey = 'jYDXW9HlEAkNwEdd4MOCq9grb9UEhR8u'
+#  APIKEY stored in enviroment
+apiKey = os.environ['APIKEY']
 header = {'apiKey' : apiKey}
 
+# urls we're pulling data from
 users_URL = 'https://alpha-api.usbank.com/innovations/v1/users'
+accounts_url = 'https://alpha-api.usbank.com/innovations/v1/user/accounts'
+transactions_url = 'https://alpha-api.usbank.com/innovations/v1/account/transactions'
+
 user_IDs = []
 response = requests.get(users_URL, headers=header).json()
 user_list = response['UserList']
+#  Getting ID for all users
 for user in user_list:
     user_IDs.append(user['LegalParticipantIdentifier'])
 
-data = {'LegalParticipantIdentifier': user_IDs[0]}
-accounts_url = 'https://alpha-api.usbank.com/innovations/v1/user/accounts'
-account_deets = []
+
+account_details = []
+
+#  getting details for each account
 for id in user_IDs:
     data = {'LegalParticipantIdentifier': id}
-    account_deets.append(requests.post(accounts_url, headers=header, data=data).json())
+    account_details.append(requests.post(accounts_url, headers=header, data=data).json())
 
 company_ID = []
 product_code = []
 primary_ID = []
-for account in account_deets:
+# getting important information from the details
+for account in account_details:
     company_ID.append(account['AccessibleAccountDetailList'][0]['OperatingCompanyIdentifier'])
     product_code.append(account['AccessibleAccountDetailList'][0]['ProductCode'])
     primary_ID.append(account['AccessibleAccountDetailList'][0]['PrimaryIdentifier'])
 
 
-transactions_url = 'https://alpha-api.usbank.com/innovations/v1/account/transactions'
 transaction_data = []
+#  posting the details we got above and getting transaction list for each user
 for i in range(len(company_ID)):
     company_data = {'OperatingCompanyIdentifier': company_ID[i], 'ProductCode': product_code[i], 'PrimaryIdentifier': primary_ID[i]}
     transaction_data.append(requests.post(transactions_url, headers=header, data=company_data).json())
 
+
+# getting data we want from transaction list
 transactions = []
 for transaction in transaction_data:
     try:
@@ -55,6 +66,7 @@ for transaction in transaction_data:
         print("No transactions for this user.")
 
 
+# coverts lists that we ordered into dictionaries
 def listsToDicts(orderedList, unorderedOneList, unorderedTwoList):
     unorderedOneDict = {}
     unorderedTwoDict = {}
@@ -69,7 +81,7 @@ def listsToDicts(orderedList, unorderedOneList, unorderedTwoList):
         orderedDict[i] = orderedList[i][1]
     return unorderedOneDict, unorderedTwoDict, orderedDict
 
-
+# converts a dictionaries to lists
 def dictToList(dictionary):
     list = []
     for item in dictionary:
@@ -143,7 +155,6 @@ for transaction in sortedTransactions:
     weeklyTotal += float(transaction[0])
 
 # Displaying our fun noise.
-print()
 for total in totalTransactions:
     totalSpent = 0.0
     totalSaved = 0.0
@@ -155,3 +166,5 @@ for total in totalTransactions:
     print('Total saved:\t$' + str(round(totalSaved, 2)))
     print('Percent saved:\t' + str(round(totalSaved / totalSpent * 100, 3)) + '%')
     print()
+
+#  TODO depositing saved ammount per transaction into savings account
