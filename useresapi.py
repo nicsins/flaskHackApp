@@ -3,30 +3,26 @@ import operator
 import datetime
 
 apiKey = 'jYDXW9HlEAkNwEdd4MOCq9grb9UEhR8u'
+header = {'apiKey' : apiKey}
+
 users_URL = 'https://alpha-api.usbank.com/innovations/v1/users'
 user_IDs = []
-
-header = {'apiKey' : apiKey}
 response = requests.get(users_URL, headers=header).json()
 user_list = response['UserList']
 for user in user_list:
     user_IDs.append(user['LegalParticipantIdentifier'])
 
 data = {'LegalParticipantIdentifier': user_IDs[0]}
-
 accounts_url = 'https://alpha-api.usbank.com/innovations/v1/user/accounts'
 account_deets = []
 for id in user_IDs:
     data = {'LegalParticipantIdentifier': id}
     account_deets.append(requests.post(accounts_url, headers=header, data=data).json())
 
-
 company_ID = []
 product_code = []
 primary_ID = []
-
 for account in account_deets:
-
     company_ID.append(account['AccessibleAccountDetailList'][0]['OperatingCompanyIdentifier'])
     product_code.append(account['AccessibleAccountDetailList'][0]['ProductCode'])
     primary_ID.append(account['AccessibleAccountDetailList'][0]['PrimaryIdentifier'])
@@ -39,12 +35,10 @@ for i in range(len(company_ID)):
     transaction_data.append(requests.post(transactions_url, headers=header, data=company_data).json())
 
 transactions = []
-
 for transaction in transaction_data:
     try:
         for i in range(len(transaction)):
             for j in range(len(transaction['TransactionList'])):
-
                 try:
                     tempTransaction = [transaction['TransactionList'][j]['PostedAmount'],
                                        transaction['TransactionList'][j]['EffectiveDate'],
@@ -60,6 +54,29 @@ for transaction in transaction_data:
     except KeyError:
         print("No transactions for this user.")
 
+
+def listsToDicts(orderedList, unorderedOneList, unorderedTwoList):
+    unorderedOneDict = {}
+    unorderedTwoDict = {}
+    orderedDict = {}
+    for i in range(len(orderedList)):
+        index = orderedList[i]
+        index = index[0]
+        valueOne = unorderedOneList[index]
+        valueTwo = unorderedTwoList[index]
+        unorderedOneDict[index] = valueOne
+        unorderedTwoDict[index] = valueTwo
+        orderedDict[i] = orderedList[i][1]
+    return unorderedOneDict, unorderedTwoDict, orderedDict
+
+
+def dictToList(dictionary):
+    list = []
+    for item in dictionary:
+        list.append(dictionary[item])
+    return list
+
+
 postedAmountDict = {}
 effectiveDateDict = {}
 primaryIDDict = {}
@@ -71,79 +88,36 @@ for i in range(len(transactions)):
     primaryIDDict[i] = transactions[i][2]
 
 # Converting them to lists and sorting the appropriate one.
-postedAmountList = []
-for item in postedAmountDict:
-    postedAmountList.append(postedAmountDict[item])
-primaryIDList = []
-for item in primaryIDDict:
-    primaryIDList.append(primaryIDDict[item])
+postedAmountList, primaryIDList = dictToList(postedAmountDict), dictToList(primaryIDDict)
 effectiveDateList = sorted(effectiveDateDict.items(), key=operator.itemgetter(1))
 
-tempSortedDateDict = {}
-tempSortedAmountDict = {}
-tempSortedIDDict = {}
-
 # Converting them back into dicts, and sorting the remaining list to match the other.
-for i in range(len(effectiveDateList)):
-    index = effectiveDateList[i]
-    index = index[0]
-    tempAmountValue = postedAmountList[index]
-    tempIDValue = primaryIDList[index]
-    tempSortedAmountDict[index] = tempAmountValue
-    tempSortedIDDict[index] = tempIDValue
-    tempSortedDateDict[i] = effectiveDateList[i][1]
+tempSortedAmountDict, tempSortedIDDict, tempSortedDateDict =\
+    listsToDicts(effectiveDateList, postedAmountList, primaryIDList)
 
 # Converting them back into lists and sorting appropriate ones.
-tempSortedDateList = []
-for item in tempSortedDateDict:
-    tempSortedDateList.append(tempSortedDateDict[item])
-tempSortedAmountList = []
-for item in tempSortedAmountDict:
-    tempSortedAmountList.append(tempSortedAmountDict[item])
-# Resetting the keys of the IDList
-tempSortedIDList = []
-for item in tempSortedIDDict:
-    tempSortedIDList.append(tempSortedIDDict[item])
+tempSortedDateList, tempSortedAmountList = dictToList(tempSortedDateDict), dictToList(tempSortedAmountDict)
+# Resetting the indices of the ID list
+tempSortedIDList = dictToList(tempSortedIDDict)
 tempSortedIDDict.clear()
 for i in range(len(tempSortedIDList)):
     tempSortedIDDict[i] = tempSortedIDList[i]
 tempSortedIDList = sorted(tempSortedIDDict.items(), key=operator.itemgetter(1))
 
-sortedAmountDict = {}
-sortedDateDict = {}
-sortedIDDict = {}
-
 # Converting them back into dicts, and sorting the remaining list to match the other.
-currentID = tempSortedIDList[0]
-for i in range(len(tempSortedIDList)):
-    index = tempSortedIDList[i]
-    index = index[0]
-    tempDateValue = tempSortedDateList[index]
-    tempAmountValue = tempSortedAmountList[index]
-    sortedDateDict[index] = tempDateValue
-    sortedAmountDict[index] = tempAmountValue
-    sortedIDDict[i] = tempSortedIDList[i][1]
+sortedDateDict, sortedAmountDict, sortedIDDict =\
+    listsToDicts(tempSortedIDList, tempSortedDateList, tempSortedAmountList)
 
 # Converting them back into lists.
-sortedAmountList = []
-for item in sortedAmountDict:
-    sortedAmountList.append(sortedAmountDict[item])
-sortedDateList = []
-for item in sortedDateDict:
-    sortedDateList.append(sortedDateDict[item])
-sortedIDList = []
-for item in sortedIDDict:
-    sortedIDList.append(sortedIDDict[item])
+sortedAmountList, sortedDateList, sortedIDList =\
+    dictToList(sortedAmountDict), dictToList(sortedDateDict), dictToList(sortedIDDict)
 
 # Combining them back into a list of lists.
 sortedTransactions = []
 for i in range(len(sortedAmountDict)):
     sortedTransactions.append([sortedAmountList[i], sortedDateList[i], sortedIDList[i]])
 
-
-
-
-
+# Getting weekly transaction figures with proper percent of spent to be saved.
 totalTransactions = {}
 weeklyTransactions = []
 emptyTransactions = []
@@ -168,6 +142,7 @@ for transaction in sortedTransactions:
         week += 1
     weeklyTotal += float(transaction[0])
 
+# Displaying our fun noise.
 print()
 for total in totalTransactions:
     totalSpent = 0.0
