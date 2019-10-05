@@ -1,6 +1,6 @@
 import requests
-import os
 import operator
+import datetime
 
 apiKey = 'jYDXW9HlEAkNwEdd4MOCq9grb9UEhR8u'
 users_URL = 'https://alpha-api.usbank.com/innovations/v1/users'
@@ -41,7 +41,6 @@ for i in range(len(company_ID)):
 transactions = []
 
 for transaction in transaction_data:
-    #TODO add something to only pull in last week or whatever
     try:
         for i in range(len(transaction)):
             for j in range(len(transaction['TransactionList'])):
@@ -65,65 +64,78 @@ postedAmountDict = {}
 effectiveDateDict = {}
 primaryIDDict = {}
 
+# Breaking up grand list into dicts to sort individually.
 for i in range(len(transactions)):
     postedAmountDict[i] = transactions[i][0]
     effectiveDateDict[i] = transactions[i][1]
     primaryIDDict[i] = transactions[i][2]
-tempSortedDateList = sorted(effectiveDateDict.items(), key=operator.itemgetter(1))
+
+# Converting them to lists and sorting the appropriate one.
+postedAmountList = []
+for item in postedAmountDict:
+    postedAmountList.append(postedAmountDict[item])
+primaryIDList = []
+for item in primaryIDDict:
+    primaryIDList.append(primaryIDDict[item])
+effectiveDateList = sorted(effectiveDateDict.items(), key=operator.itemgetter(1))
 
 tempSortedDateDict = {}
 tempSortedAmountDict = {}
 tempSortedIDDict = {}
 
-for i in range(len(tempSortedDateList)):
-    index = tempSortedDateList[i]
+# Converting them back into dicts, and sorting the remaining list to match the other.
+for i in range(len(effectiveDateList)):
+    index = effectiveDateList[i]
     index = index[0]
-    tempAmountValue = postedAmountDict[index]
-    tempIDValue = primaryIDDict[index]
+    tempAmountValue = postedAmountList[index]
+    tempIDValue = primaryIDList[index]
     tempSortedAmountDict[index] = tempAmountValue
     tempSortedIDDict[index] = tempIDValue
-    tempSortedDateDict[index] = tempSortedDateList[index] #TODO FIX BAD CODE not grabbing by index
+    tempSortedDateDict[i] = effectiveDateList[i][1]
 
-#TODO Convert to clean list and back to dicts
+# Converting them back into lists and sorting appropriate ones.
 tempSortedDateList = []
 for item in tempSortedDateDict:
-    tempSortedDateList.append(tempSortedDateDict[item][1])
-ultraTempSortedDateDict = {}
-index = 0
-for item in tempSortedDateDict:
-    ultraTempSortedDateDict[item] = tempSortedDateList[index]
-    index += 1
-tempSortedDateDict = ultraTempSortedDateDict
-
+    tempSortedDateList.append(tempSortedDateDict[item])
+tempSortedAmountList = []
+for item in tempSortedAmountDict:
+    tempSortedAmountList.append(tempSortedAmountDict[item])
+# Resetting the keys of the IDList
+tempSortedIDList = []
+for item in tempSortedIDDict:
+    tempSortedIDList.append(tempSortedIDDict[item])
+tempSortedIDDict.clear()
+for i in range(len(tempSortedIDList)):
+    tempSortedIDDict[i] = tempSortedIDList[i]
 tempSortedIDList = sorted(tempSortedIDDict.items(), key=operator.itemgetter(1))
 
 sortedAmountDict = {}
 sortedDateDict = {}
 sortedIDDict = {}
 
+# Converting them back into dicts, and sorting the remaining list to match the other.
+currentID = tempSortedIDList[0]
 for i in range(len(tempSortedIDList)):
     index = tempSortedIDList[i]
     index = index[0]
-    tempDateValue = tempSortedDateDict[index]
-    tempAmountValue = tempSortedAmountDict[index]
+    tempDateValue = tempSortedDateList[index]
+    tempAmountValue = tempSortedAmountList[index]
     sortedDateDict[index] = tempDateValue
     sortedAmountDict[index] = tempAmountValue
-    sortedIDDict[index] = tempSortedIDList[index] #TODO FIX BAD CODE not grabbing by index
-print(sortedIDDict)
-print()
-# print(sortedAmountDict)
+    sortedIDDict[i] = tempSortedIDList[i][1]
+
+# Converting them back into lists.
 sortedAmountList = []
-total = 0.0
 for item in sortedAmountDict:
     sortedAmountList.append(sortedAmountDict[item])
-    total += float(sortedAmountDict[item])
 sortedDateList = []
 for item in sortedDateDict:
-    sortedDateList.append(sortedDateDict[item][1])
+    sortedDateList.append(sortedDateDict[item])
 sortedIDList = []
 for item in sortedIDDict:
-    sortedIDList.append(sortedIDDict[item][1])
+    sortedIDList.append(sortedIDDict[item])
 
+# Combining them back into a list of lists.
 sortedTransactions = []
 for i in range(len(sortedAmountDict)):
     sortedTransactions.append([sortedAmountList[i], sortedDateList[i], sortedIDList[i]])
@@ -136,36 +148,50 @@ for i in range(len(sortedAmountDict)):
 
 #TODO REAL TIME grab totls for each week for each client and put them in a dict
 
-print(sortedTransactions)
+lastID = sortedTransactions[0][2]
+clients = 1
 
-temporaryID = sortedTransactions[0][2]
+for item in sortedTransactions:
+    if item[2] != lastID:
+        lastID = item[2]
+        clients +=1
+
+totalTransactions = []
+weeklyTransactions = []
+currentID = sortedTransactions[0][2]
+firstWeek = datetime.datetime.strptime(sortedTransactions[0][1], '%Y-%m-%d')
+weeklyTotal = 0.0
+week = 1
+
+for transaction in sortedTransactions:
+    currentWeek = datetime.datetime.strptime(transaction[1], '%Y-%m-%d')
+    if currentID != transaction[2]:
+        weeklyTransactions.append([week, weeklyTotal])
+        totalTransactions.append([currentID, weeklyTransactions])
+        currentID = transaction[2]
+        weeklyTransactions.clear()
+        firstWeek = datetime.datetime.strptime(transaction[1], '%Y-%m-%d')
+        weeklyTotal = 0.0
+        week = 1
+    if currentWeek >= firstWeek + datetime.timedelta(days=(7*week)):
+        weeklyTransactions.append([week, weeklyTotal])
+        weeklyTotal = 0.0
+        week += 1
+    weeklyTotal += float(transaction[0])
+
+temporaryID = transactions[0][2]
 temporaryTotal = 0.0
 totalDict = {}
 
-# for transaction in sortedTransactions:
-#     if transaction[2] != temporaryID:
-#         totalDict[temporaryID] = temporaryTotal
-#         print(temporaryTotal)
-#         temporaryID = transaction[2]
-#         temporaryTotal = 0.0
-#     temporaryTotal += float(transaction[0])
-# totalDict[temporaryID] = temporaryTotal
-#
-# print(totalDict)
-
-# temporaryID = transactions[0][2]
-# temporaryTotal = 0.0
-# totalDict = {}
-#
-# for transaction in transactions:
-#     if transaction[2] != temporaryID:
-#         totalDict[temporaryID] = temporaryTotal
-#         temporaryID = transaction[2]
-#         temporaryTotal = 0.0
-#         #print(transaction)
-#     temporaryTotal += float(transaction[0])
-# totalDict[temporaryID] = temporaryTotal
-
+for transaction in transactions:
+    if transaction[2] != temporaryID:
+        totalDict[temporaryID] = temporaryTotal
+        temporaryID = transaction[2]
+        temporaryTotal = 0.0
+        #print(transaction)
+    temporaryTotal += float(transaction[0])
+totalDict[temporaryID] = temporaryTotal
+print(totalDict)
 
 # for total in totalDict:
 #     #TODO determine how many weeks the user has been using this to save and multiply it by .002
