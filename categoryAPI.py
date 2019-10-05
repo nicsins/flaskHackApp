@@ -6,7 +6,7 @@ apiKey = 'API_KEY'
 users_URL = 'https://alpha-api.usbank.com/innovations/v1/users'
 user_IDs = []
 
-header = {'apiKey' : apiKey}
+header = {'apiKey' : 'jYDXW9HlEAkNwEdd4MOCq9grb9UEhR8u'}
 response = requests.get(users_URL,headers = header).json()
 user_list = response['UserList']
 for user in user_list:
