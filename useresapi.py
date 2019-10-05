@@ -140,24 +140,13 @@ sortedTransactions = []
 for i in range(len(sortedAmountDict)):
     sortedTransactions.append([sortedAmountList[i], sortedDateList[i], sortedIDList[i]])
 
-#TODO count how many clients
-#TODO break each client into lists
-#TODO break into each week
-#TODO count for each week
-#TODO return to grand total list
 
-#TODO REAL TIME grab totls for each week for each client and put them in a dict
 
-lastID = sortedTransactions[0][2]
-clients = 1
 
-for item in sortedTransactions:
-    if item[2] != lastID:
-        lastID = item[2]
-        clients +=1
 
-totalTransactions = []
+totalTransactions = {}
 weeklyTransactions = []
+emptyTransactions = []
 currentID = sortedTransactions[0][2]
 firstWeek = datetime.datetime.strptime(sortedTransactions[0][1], '%Y-%m-%d')
 weeklyTotal = 0.0
@@ -166,39 +155,28 @@ week = 1
 for transaction in sortedTransactions:
     currentWeek = datetime.datetime.strptime(transaction[1], '%Y-%m-%d')
     if currentID != transaction[2]:
-        weeklyTransactions.append([week, weeklyTotal])
-        totalTransactions.append([currentID, weeklyTransactions])
+        weeklyTransactions.append([week, weeklyTotal, (weeklyTotal * .002 * week)])
+        totalTransactions[currentID] = weeklyTransactions
         currentID = transaction[2]
-        weeklyTransactions.clear()
+        weeklyTransactions = []
         firstWeek = datetime.datetime.strptime(transaction[1], '%Y-%m-%d')
         weeklyTotal = 0.0
         week = 1
-    if currentWeek >= firstWeek + datetime.timedelta(days=(7*week)):
-        weeklyTransactions.append([week, weeklyTotal])
+    if currentWeek >= firstWeek + datetime.timedelta(weeks=week):
+        weeklyTransactions.append([week, weeklyTotal, (weeklyTotal * .002 * week)])
         weeklyTotal = 0.0
         week += 1
     weeklyTotal += float(transaction[0])
 
-temporaryID = transactions[0][2]
-temporaryTotal = 0.0
-totalDict = {}
-
-for transaction in transactions:
-    if transaction[2] != temporaryID:
-        totalDict[temporaryID] = temporaryTotal
-        temporaryID = transaction[2]
-        temporaryTotal = 0.0
-        #print(transaction)
-    temporaryTotal += float(transaction[0])
-totalDict[temporaryID] = temporaryTotal
-print(totalDict)
-
-# for total in totalDict:
-#     #TODO determine how many weeks the user has been using this to save and multiply it by .002
-#     percentToSave = .002
-#     print('User: ' + total)
-#     amount = float(totalDict[total]) * percentToSave
-#     print('Amount to save: $' + str(round(amount, 2)))
-
-
-
+print()
+for total in totalTransactions:
+    totalSpent = 0.0
+    totalSaved = 0.0
+    for transaction in totalTransactions[total]:
+        totalSpent += transaction[1]
+        totalSaved += transaction[2]
+    print('Account number:\t' + total)
+    print('Total spent:\t$' + str(round(totalSpent, 2)))
+    print('Total saved:\t$' + str(round(totalSaved, 2)))
+    print('Percent saved:\t' + str(round(totalSaved / totalSpent * 100, 3)) + '%')
+    print()
