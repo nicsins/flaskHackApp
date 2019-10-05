@@ -1,5 +1,6 @@
 import requests
 import os
+import operator
 
 apiKey = os.environ['APIKEY']
 
@@ -61,10 +62,61 @@ for transaction in transaction_data:
     except KeyError:
         print("No transactions for this user.")
 
+postedAmountDict = {}
+effectiveDateDict = {}
+primaryIDDict = {}
+
+for i in range(len(transactions)):
+    postedAmountDict[i] = transactions[i][0]
+    effectiveDateDict[i] = transactions[i][1]
+    primaryIDDict[i] = transactions[i][2]
+tempSortedDateList = sorted(effectiveDateDict.items(), key=operator.itemgetter(1))
+print(tempSortedDateList)
+
+tempSortedDateDict = {}
+tempSortedAmountDict = {}
+tempSortedIDDict = {}
+
+for i in range(len(tempSortedDateList)):
+    index = tempSortedDateList[i]
+    index = index[0]
+    tempAmountValue = postedAmountDict[index]
+    tempIDValue = primaryIDDict[index]
+    tempSortedAmountDict[index] = tempAmountValue
+    tempSortedIDDict[index] = tempIDValue
+    tempSortedDateDict[index] = tempSortedDateList[index]
+
+tempSortedIDList = sorted(tempSortedIDDict.items(), key=operator.itemgetter(1))
+
+sortedAmountDict = {}
+sortedDateDict = {}
+sortedIDDict = {}
+
+for i in range(len(tempSortedIDList)):
+    index = tempSortedIDList[i]
+    index = index[0]
+    tempDateValue = tempSortedDateDict[index]
+    tempAmountValue = tempSortedAmountDict[index]
+    sortedDateDict[index] = tempDateValue
+    sortedAmountDict[index] = tempAmountValue
+    sortedIDDict[index] = tempSortedIDList[index]
+
+sortedTransactions = []
+
+for i in range(len(sortedAmountDict)):
+    sortedTransactions.append([sortedAmountDict[i][1], sortedDateDict[i][1], sortedIDDict[i][1]])
+
+print(sortedTransactions)
+
+#TODO count how many clients
+#TODO break each client into lists
+#TODO break into each week
+#TODO count for each week
+#TODO return to grand total list
+
 temporaryID = transactions[0][2]
 temporaryTotal = 0.0
 totalDict = {}
-print(transactions)
 
 for transaction in transactions:
     if transaction[2] != temporaryID:
