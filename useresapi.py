@@ -2,8 +2,7 @@ import requests
 import os
 import operator
 
-apiKey = os.environ['APIKEY']
-
+apiKey = 'jYDXW9HlEAkNwEdd4MOCq9grb9UEhR8u'
 users_URL = 'https://alpha-api.usbank.com/innovations/v1/users'
 user_IDs = []
 
